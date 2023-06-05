@@ -32,20 +32,24 @@ function App() {
     setPersonagemBuscado({});
   };
 
+  const exibirDetalhes = (id) => {
+    console.log(id)
+  }
+
   return (
     <div className='container'>
       <input type='text' placeholder='Buscar personagem' onChange={e => setBusca(e.target.value)} />
       <button onClick={buscar}>Buscar</button>
       {personagemBuscado.name ? (
         <div>
-          <PersonagemBuscado personagem={personagemBuscado} />
+          <PersonagemBuscado personagem={personagemBuscado}  nome={personagemBuscado.name} status={personagemBuscado.status} foto={personagemBuscado.image} onClick={()=>exibirDetalhes(personagemBuscado.id)}/>
           <button onClick={exibirListaPersonagens}>Exibir lista</button>
         </div>
       ) : (
         <ul>
           {personagens.map(personagem => (
             <li key={personagem.id}>
-              <Personagem nome={personagem.name} status={personagem.status} foto={personagem.image} />
+              <Personagem nome={personagem.name} status={personagem.status} foto={personagem.image} id={personagem.id} onFilhoClick={exibirDetalhes} />
             </li>
           ))}
         </ul>
