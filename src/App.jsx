@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
+import axios from 'axios';
+import Personagem from './Components/Personagem';
+import PersonagemBuscado from './Components/PersonagemBuscado';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [personagens, setPersonagens] = useState([]);
+  const [busca, setBusca] = useState('');
+  const [personagemBuscado, setPersonagemBuscado] = useState({});
+  const API_PERSONAGENS = 'https://rickandmortyapi.com/api/character';
+  const API_BUSCA = 'https://rickandmortyapi.com/api/character/?name=';
+
+  useEffect(() => {
+    axios.get(API_PERSONAGENS).then(({ data }) => {
+      setPersonagens(data.results);
+    });
+  }, []);
+
+  const buscar = () => {
+    if (personagemBuscado.name) {
+      // Já existe um personagem buscado, não fazer nova requisição
+      return;
+    }
+
+    axios.get(API_BUSCA + busca).then(({ data }) => {
+      setPersonagemBuscado(data.results[0]);
+    });
+  };
+
+  const exibirListaPersonagens = () => {
+    setPersonagemBuscado({});
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className='container'>
+      <input type='text' placeholder='Buscar personagem' onChange={e => setBusca(e.target.value)} />
+      <button onClick={buscar}>Buscar</button>
+      {personagemBuscado.name ? (
+        <div>
+          <PersonagemBuscado personagem={personagemBuscado} />
+          <button onClick={exibirListaPersonagens}>Exibir lista</button>
+        </div>
+      ) : (
+        <ul>
+          {personagens.map(personagem => (
+            <li key={personagem.id}>
+              <Personagem nome={personagem.name} status={personagem.status} foto={personagem.image} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
